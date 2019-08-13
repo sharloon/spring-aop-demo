@@ -1,5 +1,16 @@
 spring:
   application:
     name: spring-aop-demo
-server:
-  port: 19999
+
+  #mysql数据源配置、数据库连接池配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://127.0.0.1:3306/aop-demo?autoReconnect=true&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+
+#mybatis-plus配置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  type-aliases-package: stu.hxl.aop.dao.entity
