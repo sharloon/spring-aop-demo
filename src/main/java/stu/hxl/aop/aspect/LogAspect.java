@@ -1,23 +1,17 @@
 package stu.hxl.aop.aspect;
 
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.hutool.http.HttpUtil;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
-import org.aspectj.lang.reflect.MethodSignature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import stu.hxl.aop.annotation.SysLog;
-import sun.nio.cs.ext.GBK;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -49,8 +43,6 @@ public class LogAspect {
     @Around("@annotation(sysLog)")
     public void around(ProceedingJoinPoint point, SysLog sysLog) {
 
-//        log.info("===================================================================================================");
-
         // 记录日志的逻辑不能影响正常的业务逻辑
         long startTime = System.currentTimeMillis();
         point.proceed();
@@ -58,7 +50,7 @@ public class LogAspect {
         try {
             handle(point, sysLog, startTime);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("记录日志出现异常: " + e);
         }
 
     }
@@ -123,7 +115,7 @@ public class LogAspect {
             sb.append(" & ");
         }
 
-        return sb.substring(0, sb.lastIndexOf("&") - 1);
+        return StringUtils.isEmpty(sb.toString()) ? "" : sb.substring(0, sb.lastIndexOf("&"));
     }
 
 }
