@@ -14,3 +14,6 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml
   type-aliases-package: stu.hxl.aop.dao.entity
+  global-config:
+    db-config:
+      id-type: auto

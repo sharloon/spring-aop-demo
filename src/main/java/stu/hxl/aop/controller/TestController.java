@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import stu.hxl.aop.annotation.LoginCheck;
-import stu.hxl.aop.annotation.SysLog;
+import stu.hxl.aop.annotation.BusinessLog;
 import stu.hxl.aop.service.SysLogService;
 
 /**
@@ -22,11 +22,11 @@ public class TestController {
     private SysLogService sysLogService;
 
     @SneakyThrows
-    @SysLog("say hello接口")
+    @BusinessLog("say hello接口")
     @GetMapping("/hello")
     public String hello(String name) {
 
-        stu.hxl.aop.dao.entity.SysLog sysLog = sysLogService.selectById(1);
+        stu.hxl.aop.dao.entity.SysLog sysLog = sysLogService.getById(1);
 
         System.out.println("log: " + sysLog.toString());
 

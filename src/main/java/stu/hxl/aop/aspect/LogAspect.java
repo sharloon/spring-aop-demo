@@ -6,10 +6,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import stu.hxl.aop.annotation.SysLog;
+import stu.hxl.aop.annotation.BusinessLog;
+import stu.hxl.aop.log.LogManager;
+import stu.hxl.aop.log.LogTaskFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -23,6 +26,9 @@ import java.util.Map;
 @Aspect
 @Configuration
 public class LogAspect {
+
+    @Autowired
+    private LogManager logManager;
 
     /**
      * 方法一：通过定义切入点Pointcut
@@ -40,22 +46,22 @@ public class LogAspect {
      */
 
     @SneakyThrows
-    @Around("@annotation(sysLog)")
-    public void around(ProceedingJoinPoint point, SysLog sysLog) {
+    @Around("@annotation(businessLog)")
+    public void around(ProceedingJoinPoint point, BusinessLog businessLog) {
 
         // 记录日志的逻辑不能影响正常的业务逻辑
         long startTime = System.currentTimeMillis();
         point.proceed();
 
         try {
-            handle(point, sysLog, startTime);
+            handle(point, businessLog, startTime);
         } catch (Exception e) {
             System.out.println("记录日志出现异常: " + e);
         }
 
     }
 
-    private void handle(ProceedingJoinPoint point, SysLog sysLog, long startTime) {
+    private void handle(ProceedingJoinPoint point, BusinessLog businessLog, long startTime) {
         //获取请求的类
         String className = point.getTarget().getClass().getName();
         System.out.println("类名： " + className);
@@ -88,13 +94,42 @@ public class LogAspect {
         System.out.println("请求的用户名：" + accessToken);
 
         // 接口描述信息
-        String desc = sysLog.value();
-        System.out.println("接口描述信息：" + desc);
+        String title = businessLog.value();
+        System.out.println("接口描述信息：" + title);
 
         //请求接口耗时
         long endTime = System.currentTimeMillis();
         long time = endTime - startTime;
         System.out.println("接口耗时：" + time);
+
+        //用户
+        String userName = getUserName(request);
+
+        System.out.println("开始执行日志写入逻辑：");
+
+        logManager.executeLog(LogTaskFactory.createBusinessLog(uri, title, className, methodName, requestParam, clientIP, UA, userName));
+    }
+
+    /**
+     * 获取请求的用户
+     * @param request
+     * @return
+     */
+    private String getUserName(HttpServletRequest request) {
+
+        String accessToken = request.getHeader("access_token");
+
+        if(StringUtils.isEmpty(accessToken)) {
+            accessToken = request.getParameter("access_token");
+        }
+
+        if(StringUtils.isEmpty(accessToken)) {
+            return "";
+        }
+
+        //根据accessToken查询出对应的用户,这里具体业务具体实现
+
+        return "sharloon";
     }
 
     private String getRequestParams(HttpServletRequest request) {

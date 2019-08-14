@@ -1,6 +1,6 @@
 package stu.hxl.aop.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 import stu.hxl.aop.dao.entity.SysLog;
 
